@@ -1,0 +1,52 @@
+#carton-stage {
+  position:fixed; inset:0; width:100%; height:100%; max-width:none; max-height:none; box-sizing:border-box;
+  margin:0; padding:0; border:0; border-radius:0; background:transparent; color:var(--vault-ink,#f3e9d2);
+  overflow:hidden; isolation:isolate; overscroll-behavior:contain; font-family:inherit;
+}
+#carton-stage::backdrop {background:transparent}
+.carton-room,.carton-board-host,.carton-pack-layer {position:absolute;inset:0;pointer-events:none}
+.carton-room {
+  background:radial-gradient(ellipse at 50% 43%,#634c2010 18%,#11181340 63%,#090d0dd9 100%),
+    linear-gradient(0deg,#12201bd9,transparent 42%,#10191824),url('arrival/stage.webp') center/cover,#1d2925;
+}
+.carton-board-host {z-index:1;opacity:0}
+.carton-board-host iframe {display:block;width:100%;height:100%;border:0;background:transparent}
+.carton-holder {
+  position:absolute; z-index:2; left:50%;top:55%;width:min(78vw,56vh,560px);aspect-ratio:960/1080;
+  transform:translate(-50%,-50%);pointer-events:none;
+}
+.carton-holder::before {content:'';position:absolute;left:11%;right:6%;bottom:1%;height:12%;border-radius:50%;background:#050b09;filter:blur(14px);opacity:.62}
+.carton-lift {position:absolute;inset:0;transform-origin:top left}
+.carton-lift > .carton-object {width:100%;height:100%}
+.carton-cover {position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.carton-pack-layer {z-index:3}
+.carton-head,.carton-foot {position:absolute;z-index:5;display:flex;align-items:center;pointer-events:none}
+.carton-head {left:max(5vw,env(safe-area-inset-left));right:max(5vw,env(safe-area-inset-right));top:max(4.5vh,env(safe-area-inset-top));justify-content:space-between}
+.carton-head h2 {margin:0;color:var(--vault-glint);font:600 clamp(21px,3.1vw,36px)/1.22 "Songti SC","STSong",serif;letter-spacing:.12em;text-shadow:0 2px 5px #000}
+.carton-count {display:block;margin-top:.45em;color:var(--vault-muted);font-size:clamp(12px,1.15vw,15px);letter-spacing:.13em}
+.carton-foot {bottom:max(4.5vh,env(safe-area-inset-bottom));left:3%;right:3%;justify-content:center;gap:12px}
+.carton-hint {margin:0;font:500 clamp(14px,1.4vw,17px)/1.5 "Songti SC","STSong",serif;letter-spacing:.16em;color:var(--vault-ink);text-shadow:0 1px 5px #000}
+#carton-stage :is(.carton-exit,.carton-retry) {pointer-events:auto;cursor:pointer;border:1px solid var(--vault-edge);border-radius:var(--vault-radius);background:var(--vault-inset);color:var(--vault-ink);padding:9px 17px;font:500 14px/1.2 var(--vault-title,serif);letter-spacing:.08em;box-shadow:inset 0 0 0 2px #0003,0 3px 8px #0005}
+#carton-stage .carton-retry[hidden] {display:none}
+#carton-stage :focus-visible {outline:2px solid var(--vault-glint);outline-offset:4px}
+#carton-stage .carton-object:focus:not(:focus-visible) {outline:0}
+#carton-stage[data-stage="approach"] :is(.carton-head,.carton-foot){visibility:hidden}
+#carton-stage[data-stage="wrapped"] .carton-object {pointer-events:auto}
+#carton-stage:is([data-stage="dealing"],[data-stage="picking"],[data-stage="flying"]) .carton-holder {
+  transform:translate(-50%,-50%) translateY(var(--carton-draw-offset,0px)) scale(var(--carton-draw-scale,1));
+  transition:transform .58s cubic-bezier(.24,.68,.22,1),opacity .38s ease-out;
+}
+#carton-stage[data-stage="dealing"]:has(.carton-pack-layer[data-pack-phase="cleared"]) .carton-holder,
+#carton-stage:is([data-stage="picking"],[data-stage="flying"]) .carton-holder {opacity:0}
+#carton-stage:is([data-stage="handoff"],[data-stage="playing"],[data-stage="returning"]) .carton-holder,
+#carton-stage:is([data-stage="playing"],[data-stage="returning"]) .carton-pack-layer {visibility:hidden}
+#carton-stage:is([data-stage="handoff"],[data-stage="playing"]) :is(.carton-head,.carton-foot) {visibility:hidden}
+#carton-stage:is([data-stage="playing"],[data-stage="handoff"]) .carton-board-host {opacity:1}
+#carton-stage[data-stage="handoff"] .carton-pack-layer {opacity:0}
+#carton-stage[data-stage="playing"] .carton-board-host {pointer-events:auto}
+.carton-destination {position:absolute;visibility:hidden;pointer-events:none;left:50%;top:54.4167%;height:46.107vh;aspect-ratio:344/610;transform:translate(-50%,-50%)}
+@media(min-aspect-ratio:113/100){.carton-destination{left:calc(50% + min(17vw,30.8333vh));top:50.6667%;height:64.5583vh}}
+@media(max-aspect-ratio:64/100){.carton-destination{top:calc(50% + 7.3611vw);height:min(124.49vw,calc(85.9155vh - 66.3459vw))}}
+@media(prefers-reduced-motion:reduce){#carton-stage:is([data-stage]) .carton-holder {transition:none}}
+
+html.has-pack-gallery:has(#carton-stage[open]) {overflow:hidden}

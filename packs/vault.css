@@ -1,0 +1,19 @@
+/* Materials shared by the collection room, its fittings and the web game controls. */
+:root {
+  --vault-ground:#111713; --vault-deep:#101612; --vault-panel:#202923; --vault-relief:#344137;
+  --vault-ink:#f6ebd4; --vault-muted:#c9be9e; --vault-metal:#d2b378; --vault-glint:#ffe4a9;
+  --vault-edge:#8e774e; --vault-shadow:#4b402b; --vault-trace:#9d875749;
+  --vault-solid:linear-gradient(164deg,#f0d6a2 0%,#d2b176 19%,#bb975d 67%,#dbba80);
+  --vault-inset:linear-gradient(148deg,#394137 0%,#232a23 33%,#161c18 80%,#2d3329);
+  --vault-cut:polygon(7px 0,calc(100% - 7px) 0,100% 7px,100% calc(100% - 7px),calc(100% - 7px) 100%,7px 100%,0 calc(100% - 7px),0 7px);
+  --vault-radius:1px; --vault-scene:url('themes/bronze.webp');
+  --vault-title:"Songti SC","STSong","Noto Serif CJK SC","SimSun",serif;
+  --vault-sans:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+}
+html[data-screen="game"] :is(#catalog-trigger,#pack-select-trigger,#arrival-recovery a,#arrival-recovery button) {
+  box-sizing:border-box; min-height:38px; padding:7px 16px; border:1px solid var(--vault-edge); border-radius:var(--vault-radius);
+  background:var(--vault-inset); color:var(--vault-ink); text-shadow:0 1px 2px #000;
+  box-shadow:inset 0 1px 0 #ffffff26,inset 0 0 0 3px #0004,inset 0 0 0 4px var(--vault-trace),0 3px 8px #0008;
+  font:600 14px/1.35 var(--vault-title); letter-spacing:.08em; cursor:pointer;
+}
+html[data-screen="game"] :is(#catalog-trigger,#pack-select-trigger,#arrival-recovery a,#arrival-recovery button):is(:hover,:focus-visible) { border-color:var(--vault-glint); color:var(--vault-glint); }
