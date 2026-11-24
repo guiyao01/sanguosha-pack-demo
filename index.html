@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-screen="game">
+<html lang="zh-CN" data-screen="game" data-demo="mountain">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -15,7 +15,7 @@
     #pack-arrival {
       position: fixed; z-index: 10; inset: 0;
       background: linear-gradient(#06161545, #06161545), #12221f url("packs/arrival/stage.webp") center / cover no-repeat;
-      transition: opacity .16s ease-out, visibility 0s .16s;
+      touch-action: none; transition: opacity .16s ease-out, visibility 0s .16s;
     }
     /* Match the sealed wrapper's position in the Cocos portrait and landscape layouts. */
     #pack-arrival::before {
@@ -35,6 +35,11 @@
       position: absolute; inset: auto 0 max(6%, env(safe-area-inset-bottom));
       text-align: center; color: #e9dfc7; font: 14px/1.5 "PingFang SC", sans-serif;
     }
+    #arrival-note { margin: 0 12px 9px; }
+    #arrival-progress { display: block; width: min(220px, 58vw); height: 3px; margin: 0 auto 10px; appearance: none; border: 0; border-radius: 2px; overflow: hidden; background: #3c3930; accent-color: #d6b87b; }
+    #arrival-progress::-webkit-progress-bar { background: #3c3930; }
+    #arrival-progress::-webkit-progress-value { background: #d6b87b; }
+    #arrival-progress::-moz-progress-bar { background: #d6b87b; }
     .arrival-status button {
       padding: 9px 15px; border: 1px solid #94815e; border-radius: 3px;
       color: #ead9b5; background: #18271f; font: inherit; cursor: pointer;
@@ -43,10 +48,11 @@
   </style>
 </head>
 <body>
-  <div id="pack-arrival">
+  <div id="pack-arrival" aria-busy="true">
     <div class="arrival-status">
-      <p id="arrival-note" role="status" hidden>正在准备卡包…</p>
-      <button id="arrival-retry" type="button" hidden>重新载入</button>
+      <p id="arrival-note" role="status">正在载入山包…</p>
+      <progress id="arrival-progress" aria-label="试玩素材加载进度" max="100"></progress>
+      <button id="arrival-retry" type="button" hidden>重新加载</button>
     </div>
   </div>
   <div id="GameDiv" cc_exact_fit_screen="true">
@@ -56,15 +62,20 @@
   </div>
   <script>
     const note = document.getElementById('arrival-note');
+    const bar = document.getElementById('arrival-progress');
     const retry = document.getElementById('arrival-retry');
-    const slow = setTimeout(() => { note.hidden = false; }, 2200);
-    const stalled = setTimeout(() => { retry.hidden = false; }, 15000);
-    function clearArrivalTimers() { clearTimeout(slow); clearTimeout(stalled); }
-    window.addEventListener('pack-scene-ready', clearArrivalTimers, { once: true });
+    window.addEventListener('pack-load-progress', ({ detail: { loaded, total } }) => {
+      if (!retry.hidden) return;
+      const percent = Math.floor(100 * loaded / total);
+      bar.value = percent;
+      note.textContent = percent === 100 ? '正在准备牌桌…' : '正在载入山包 · ' + percent + '%';
+    });
+    window.addEventListener('pack-scene-ready', () => {
+      document.getElementById('pack-arrival').setAttribute('aria-busy', 'false');
+    }, { once: true });
     function reportLoadFailure() {
-      clearArrivalTimers();
-      note.textContent = '卡包未能载入';
-      note.hidden = retry.hidden = false;
+      note.textContent = '素材加载中断，请检查网络后重试';
+      retry.hidden = false;
     }
     retry.addEventListener('click', () => location.reload());
     window.addEventListener('pack-load-error', reportLoadFailure);
@@ -73,7 +84,7 @@
   <script src="src/system.bundle.js" onerror="reportLoadFailure()"></script>
   <script src="src/import-map.json" type="systemjs-importmap"></script>
   <script>
-    if (window.System) System.import('./index.js?v=pack-v2').catch(reportLoadFailure);
+    if (window.System) System.import('./index.pack-v3.js').catch(reportLoadFailure);
   </script>
 </body>
 </html>
