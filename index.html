@@ -1,27 +1,79 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-screen="game">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#111713">
-  <title>三国杀 · 山包开盒试玩</title>
+  <meta name="theme-color" content="#141512">
+  <title>三国杀 · 山包开包试玩</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="packs/vault.css">
-  <link rel="stylesheet" href="packs/demo.css">
-  <link rel="stylesheet" href="packs/carton-object.css">
-  <link rel="stylesheet" href="packs/carton-packs.css">
-  <link rel="stylesheet" href="packs/carton-flow.css">
+  <link rel="preload" as="image" href="packs/arrival/mountain.webp">
+  <link rel="preload" as="image" href="packs/arrival/stage.webp">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    html, body { background: #141512; overscroll-behavior: none; }
+    #GameCanvas { touch-action: none; }
+    #pack-arrival {
+      position: fixed; z-index: 10; inset: 0;
+      background: linear-gradient(#06161545, #06161545), #12221f url("packs/arrival/stage.webp") center / cover no-repeat;
+      transition: opacity .16s ease-out, visibility 0s .16s;
+    }
+    /* Match the sealed wrapper's position in the Cocos portrait and landscape layouts. */
+    #pack-arrival::before {
+      content: ""; position: absolute; left: 50%; top: 54.4167%;
+      height: 46.107vh; aspect-ratio: 344 / 610; transform: translate(-50%, -50%);
+      background: url("packs/arrival/mountain.webp") center / contain no-repeat;
+    }
+    @media (min-aspect-ratio: 113/100) {
+      #pack-arrival::before { left: calc(50% + min(17vw, 30.8333vh)); top: 50.6667%; height: 64.5583vh; }
+    }
+    @media (max-aspect-ratio: 64/100) {
+      #pack-arrival::before { top: calc(50% + 7.3611vw); height: min(124.49vw, calc(85.9155vh - 66.3459vw)); }
+    }
+    html[data-pack-scene-ready="true"] #pack-arrival { opacity: 0; visibility: hidden; pointer-events: none; }
+    @media (prefers-reduced-motion: reduce) { #pack-arrival { transition: none; } }
+    .arrival-status {
+      position: absolute; inset: auto 0 max(6%, env(safe-area-inset-bottom));
+      text-align: center; color: #e9dfc7; font: 14px/1.5 "PingFang SC", sans-serif;
+    }
+    .arrival-status button {
+      padding: 9px 15px; border: 1px solid #94815e; border-radius: 3px;
+      color: #ead9b5; background: #18271f; font: inherit; cursor: pointer;
+    }
+    [hidden] { display: none !important; }
+  </style>
 </head>
 <body>
-  <main class="demo">
-    <header><span class="demo-mark" aria-hidden="true">将</span><h1>三国杀</h1></header>
-    <section aria-label="山卡盒">
-      <button id="demo-start" type="button" disabled aria-label="打开山卡盒">
-        <img src="packs/boxes/mountain.webp" width="960" height="1080" alt="" draggable="false" fetchpriority="high">
-        <span>打开山卡盒</span>
-      </button>
-    </section>
-  </main>
-  <script type="module" src="packs/demo.js"></script>
+  <div id="pack-arrival">
+    <div class="arrival-status">
+      <p id="arrival-note" role="status" hidden>正在准备卡包…</p>
+      <button id="arrival-retry" type="button" hidden>重新载入</button>
+    </div>
+  </div>
+  <div id="GameDiv" cc_exact_fit_screen="true">
+    <div id="Cocos3dGameContainer">
+      <canvas id="GameCanvas" aria-label="撕开山包，自选顺序翻开五张牌，点卡面放大查看" tabindex="0" oncontextmenu="event.preventDefault()"></canvas>
+    </div>
+  </div>
+  <script>
+    const note = document.getElementById('arrival-note');
+    const retry = document.getElementById('arrival-retry');
+    const slow = setTimeout(() => { note.hidden = false; }, 2200);
+    const stalled = setTimeout(() => { retry.hidden = false; }, 15000);
+    function clearArrivalTimers() { clearTimeout(slow); clearTimeout(stalled); }
+    window.addEventListener('pack-scene-ready', clearArrivalTimers, { once: true });
+    function reportLoadFailure() {
+      clearArrivalTimers();
+      note.textContent = '卡包未能载入';
+      note.hidden = retry.hidden = false;
+    }
+    retry.addEventListener('click', () => location.reload());
+    window.addEventListener('pack-load-error', reportLoadFailure);
+  </script>
+  <script src="src/polyfills.bundle.js" onerror="reportLoadFailure()"></script>
+  <script src="src/system.bundle.js" onerror="reportLoadFailure()"></script>
+  <script src="src/import-map.json" type="systemjs-importmap"></script>
+  <script>
+    if (window.System) System.import('./index.js?v=pack-v2').catch(reportLoadFailure);
+  </script>
 </body>
 </html>

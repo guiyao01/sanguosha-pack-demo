@@ -16,12 +16,14 @@ System.register(["./application.js"], function (_export, _context) {
       canvas.width = bcr.width;
       canvas.height = bcr.height;
       application = new Application();
+      application.settingsPath = 'src/settings.json?v=pack-v2';
       topLevelImport('cc').then(function (engine) {
         return application.init(engine);
       }).then(function () {
         return application.start();
       })["catch"](function (err) {
         console.error(err);
+        window.dispatchEvent(new Event('pack-load-error'));
       });
     }
   };
