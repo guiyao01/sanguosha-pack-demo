@@ -41,3 +41,5 @@ window.addEventListener('popstate', () => {
   if (history.state?.demoBox) openDemo();
   else closeCarton();
 });
+
+startButton.disabled = false;
